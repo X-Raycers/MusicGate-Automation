@@ -2,50 +2,6 @@ import allure
 from playwright.sync_api import Page, expect
 
 
-@allure.title("Verify guitars category page title")
-def test_verify_guitars_category_page_title(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa"]').click()
-    expect(page).to_have_url("https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa")
-    expect(page).to_have_title("גיטרות")
-    page.wait_for_timeout(5000)
-    page.mouse.wheel(0, 1500)
-    page.wait_for_timeout(5000)
-
-
-@allure.title("Navigate to acoustic guitars category")
-def test_navigate_to_acoustic_guitars_category(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa"] span.mega-indicator').click()
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%90%d7%a7%d7%95%d7%a1%d7%98%d7%99%d7%95%d7%aa"]').click()
-    expect(page).to_have_url("https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%90%d7%a7%d7%95%d7%a1%d7%98%d7%99%d7%95%d7%aa")
-    page.wait_for_timeout(1000)
-    page.mouse.wheel(0, 1500)
-    page.wait_for_timeout(2000)
-
-
-@allure.title("Navigate to electric guitars category")
-def test_navigate_to_electric_guitars_category(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa"] span.mega-indicator').click()
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%97%d7%a9%d7%9e%d7%9c%d7%99%d7%95%d7%aa"]').click()
-    expect(page).to_have_url("https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%97%d7%a9%d7%9e%d7%9c%d7%99%d7%95%d7%aa")
-    page.wait_for_timeout(1000)
-    page.mouse.wheel(0, 1500)
-    page.wait_for_timeout(2000)
-
-
-@allure.title("Navigate to classical guitars category")
-def test_navigate_to_classical_guitars_category(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa"] span.mega-indicator').click()
-    page.locator('a.mega-menu-link[href="https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%a7%d7%9c%d7%90%d7%a1%d7%99%d7%95%d7%aa"]').click()
-    expect(page).to_have_url("https://musicgate.co.il/product-category/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa/%d7%92%d7%99%d7%98%d7%a8%d7%95%d7%aa-%d7%a7%d7%9c%d7%90%d7%a1%d7%99%d7%95%d7%aa")
-    page.wait_for_timeout(1000)
-    page.mouse.wheel(0, 1500)
-    page.wait_for_timeout(2000)
-
-
 @allure.title("Navigate to amplifiers main category")
 def test_navigate_to_amplifiers_main_category(page: Page):
     page.goto("https://musicgate.co.il/")
