@@ -110,8 +110,9 @@ This project was built on a real, live website. The goal was not only to validat
 
 The site uses WP Rocket, which delays loading JavaScript until the user moves the mouse or scrolls. Until then, a loading overlay blocks every click.
 
-- **Earlier version:** the tests were slowed down with SlowMo- **Root cause fix:** BasePage simulates a mouse move and scroll after opening each page, then waits for the overlay to disappear
-- **Result:** all tests run at full speed without SlowMo
+- Earlier version: the tests were slowed down with SlowMo
+- Root cause fix: BasePage simulates a mouse move and scroll after opening each page, then waits for the overlay to disappear
+- Result: all tests run at full speed without SlowMo
 
 ## Mega Menu and Categories
 
@@ -123,7 +124,7 @@ The page object hovers, waits for the menu to report it is open (`aria-expanded=
 "Add to cart" sends the product to the server in the background, without reloading the page. Moving to the cart too early produced an empty cart - a **flaky test**.
 The fix waits for the server's response to the add-to-cart request before continuing.
 
-## A Live Site Changes
+## Live Site Changes
 
 Some failures were not bugs in the tests or in the site, but changes to the site:
 - A product used in the tests was removed (page returns 404)
