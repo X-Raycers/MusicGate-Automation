@@ -27,9 +27,11 @@ The framework includes automated coverage for:
 
 # Automation Demo Video
 
-This 15-minute video demonstrates the MusicGate Playwright Automation project and its automated UI tests.
+A short trailer and a full run of the MusicGate Playwright Automation project.
 
-[▶ Watch the Full Automation Demo (15 Minutes)](https://www.youtube.com/watch?v=bD2FuiPhwwA)
+▶ [Trailer (2 Minutes)](https://www.youtube.com/watch?v=L8lnFksDMEA)
+
+▶ [Full Test Run (11 Minutes)](https://www.youtube.com/watch?v=8svUozZw1XI) - all 46 tests, final results and the Allure report
 
 ---
 
