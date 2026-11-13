@@ -92,8 +92,9 @@ Smoke tests are a small set of critical checks: the homepage loads, the login pa
 
 Allure results from each CI run are saved as a downloadable artifact.
 
----
+**Note:** the site is protected by Cloudflare, which sometimes blocks cloud servers such as GitHub Actions and shows a "security verification" page instead of the site. The framework detects this page and marks the tests as **skipped** with a clear reason, instead of trying to bypass the protection. The full suite is run locally.
 
+---
 # Challenges and How They Were Solved
 
 This project was built on a real, live website. The goal was not only to validate functionality, but to understand **why** tests fail on a real site and fix the root cause.

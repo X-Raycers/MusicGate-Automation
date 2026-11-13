@@ -12,3 +12,4 @@ def test_homepage_loads(page: Page):
     home.open_homepage()
 
     expect(page).to_have_url(BASE_URL + "/")
+    expect(page.locator("img.site-logo")).to_be_visible()
