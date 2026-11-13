@@ -29,9 +29,9 @@ The framework includes automated coverage for:
 
 A short trailer and a full run of the MusicGate Playwright Automation project.
 
-▶ [Trailer (2 Minutes)](https://www.youtube.com/watch?v=L8lnFksDMEA)
+▶ [Trailer (2 Minutes)](https://www.youtube.com/watch?v=8svUozZw1XI)
 
-▶ [Full Test Run (11 Minutes)](https://www.youtube.com/watch?v=8svUozZw1XI) - all 46 tests, final results and the Allure report
+▶ [Full Test Run (11 Minutes)](https://www.youtube.com/watch?v=L8lnFksDMEA) - all 46 tests, final results and the Allure report
 
 ---
 
