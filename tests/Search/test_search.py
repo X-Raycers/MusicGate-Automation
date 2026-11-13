@@ -1,58 +1,66 @@
+import re
+
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
+from POM.search.search_page import SearchPage
+
+RESULTS_FOR = "תוצאות חיפוש עבור"
+
+
+@pytest.fixture
+def search_page(page: Page) -> SearchPage:
+    search = SearchPage(page)
+    search.open_homepage()
+    return search
+
+
 @allure.title("Open search")
-def test_open_search(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("גיטרה")
-    page.get_by_role("button", name="חיפוש").click()
-    expect(page.locator("body")).to_contain_text("גיטרה")
+def test_open_search(search_page: SearchPage):
+    search_page.search_with_button("גיטרה")
+
+    expect(search_page.body()).to_contain_text("גיטרה")
 
 
-@allure.title("Search existing product")
-def test_search_existing_product(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("CUENCA")
-    page.keyboard.press("Enter")
-    (expect( page.locator("h2.mf-catalog-title"))
-    .to_contain_text("תוצאות חיפוש עבור"))
-    expect(page.locator("body")).to_contain_text("CUENCA")
+@allure.title("Search for '{text}'")
+@pytest.mark.parametrize(
+    "text",
+    [
+        pytest.param("CUENCA", id="existing_product", marks=pytest.mark.smoke),
+        pytest.param("abcdefxyz123", id="invalid_product"),
+        pytest.param("@#$%^&*!", id="special_characters"),
+    ],
+)
+def test_search_shows_results_page(search_page: SearchPage, text: str):
+    search_page.search_with_enter(text)
+
+    expect(search_page.page).to_have_url(re.compile(r"[?&]s="))
+    expect(search_page.catalog_title_h2()).to_contain_text(text)
 
 
-@allure.title("Search invalid product")
-def test_search_invalid_product(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("abcdefxyz123")
-    page.keyboard.press("Enter")
-    (expect( page.locator("h2.mf-catalog-title"))
-    .to_contain_text("תוצאות חיפוש עבור"))
-    expect(page.locator("body")).to_contain_text("abcdefxyz123")
+@allure.title("Search results title is in Hebrew")
+@pytest.mark.xfail(
+    reason="BUG: on the Hebrew site the results title is shown in English "
+    "('Search Results for ...' instead of 'תוצאות חיפוש עבור ...')"
+)
+def test_search_results_title_in_hebrew(search_page: SearchPage):
+    search_page.search_with_enter("גיטרה")
+
+    expect(search_page.catalog_title_h2()).to_contain_text(RESULTS_FOR)
 
 
 @allure.title("Empty search")
-def test_empty_search(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("")
-    page.keyboard.press("Enter")
-    expect(page.locator("h1.mf-catalog-title")
-    ).to_contain_text("תוצאות חיפוש")
+def test_empty_search(search_page: SearchPage):
+    search_page.search_with_enter("")
+
+    expect(search_page.catalog_title_h1()).to_contain_text("תוצאות חיפוש")
 
 
-@allure.title("Search with special characters")
-def test_search_special_characters(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("@#$%^&*!")
-    page.keyboard.press("Enter")
-    (expect(page.locator("h2.mf-catalog-title"))
-    .to_contain_text("תוצאות חיפוש עבור"))
-    expect(page.locator("body")).to_contain_text("@#$%^&*!")
+@allure.title("Sort search results by latest")
+def test_navigate_from_search(search_page: SearchPage):
+    search_page.search_with_enter("גיטרה")
+    search_page.click_sort_by_latest()
 
-
-@allure.title("Navigate from search result")
-def test_navigate_from_search(page: Page):
-    page.goto("https://musicgate.co.il/")
-    page.get_by_role("textbox").fill("גיטרה")
-    page.keyboard.press("Enter")
-    page.get_by_role( "link",name="למיין לפי המעודכן ביותר").click()
-    expect(page).to_have_url(("https://musicgate.co.il/%D7%97%D7%A0%D7%95%D7%AA-%D7%9B%D7%9C%D7%99-%D7%A0%D7%92%D7%99%D7%A0%D7%94-%D7%94%D7%9E%D7%A9%D7%AA%D7%9C%D7%9E%D7%AA-%D7%91%D7%99%D7%A9%D7%A8%D7%90%D7%9C?orderby=date&s=%D7%92%D7%99%D7%98%D7%A8%D7%94&post_type=product"))
-    expect(page.locator("body")).to_contain_text("גיטרה")
+    expect(search_page.page).to_have_url(re.compile(r"orderby=date"))
+    expect(search_page.body()).to_contain_text("גיטרה")

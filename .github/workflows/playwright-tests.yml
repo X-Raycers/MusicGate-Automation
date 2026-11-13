@@ -30,4 +30,11 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          pytest tests/Smoke --browser chromium --alluredir=allure-results
+          pytest -m smoke --browser chromium --alluredir=allure-results
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results

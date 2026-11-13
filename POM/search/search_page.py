@@ -1,41 +1,31 @@
-from pages.common.base_page import BasePage
+from POM.base_page import BasePage
 
 
 class SearchPage(BasePage):
+    """Header product search and the search results page."""
 
-    def search_product(self, product_name):
-        self.page.get_by_role(
-            "textbox"
-        ).fill(product_name)
+    def search_box(self):
+        return self.page.get_by_role("textbox")
 
-    def click_search_button(self):
-        self.page.get_by_role(
-            "button",
-            name="חיפוש"
-        ).click()
+    def search_with_button(self, text: str):
+        self.search_box().fill(text)
+        # The site has 2 search forms (normal + sticky header), use the first
+        self.page.get_by_role("button", name="חפש").first.click()
 
-    def press_enter(self):
-        self.page.keyboard.press(
-            "Enter"
-        )
+    def search_with_enter(self, text: str):
+        self.search_box().fill(text)
+        self.page.keyboard.press("Enter")
 
     def click_sort_by_latest(self):
-        self.page.get_by_role(
-            "link",
-            name="למיין לפי המעודכן ביותר"
-        ).click()
+        # The sort options are a dropdown that opens on hover
+        self.page.locator("ul.woocommerce-ordering li.current").hover()
+        self.page.get_by_role("link", name="למיין לפי המעודכן ביותר").click()
 
     def catalog_title_h1(self):
-        return self.page.locator(
-            "h1.mf-catalog-title"
-        )
+        return self.page.locator("h1.mf-catalog-title")
 
     def catalog_title_h2(self):
-        return self.page.locator(
-            "h2.mf-catalog-title"
-        )
+        return self.page.locator("h2.mf-catalog-title")
 
-    def body_text(self):
-        return self.page.locator(
-            "body"
-        )
+    def body(self):
+        return self.page.locator("body")

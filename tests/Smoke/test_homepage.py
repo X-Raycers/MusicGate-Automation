@@ -1,8 +1,14 @@
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
+from POM.base_page import BASE_URL, BasePage
 
-@allure.title("Homepage loads successfully")
+
+@allure.title("Homepage loads")
+@pytest.mark.smoke
 def test_homepage_loads(page: Page):
-    page.goto("https://musicgate.co.il/")
-    expect(page).to_have_url("https://musicgate.co.il/")
+    home = BasePage(page)
+    home.open_homepage()
+
+    expect(page).to_have_url(BASE_URL + "/")

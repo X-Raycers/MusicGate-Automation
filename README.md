@@ -1,6 +1,6 @@
 # MusicGate Playwright Automation
 
-UI automation testing framework for the MusicGate e-commerce website using Playwright, Pytest, Page Object Model (POM), and Allure Reports.
+UI automation testing framework for the MusicGate e-commerce website using Playwright, Pytest, Page Object Model (POM), Allure Reports and GitHub Actions CI.
 
 ---
 
@@ -15,20 +15,22 @@ The framework includes automated coverage for:
 - Product Search
 - Login Functionality
 - Shopping Cart
-- Product Categories
+- Product Categories (mega menu navigation)
 - Footer Navigation
 
-A total of 46 automated UI tests were created during the project.
+**46 automated UI tests** - all running without SlowMo:
+- 44 passed
+- 1 xfail - a known bug on the site (see [Bugs Found](#bugs-found))
+- 1 skipped - a feature that was removed from the site
 
 ---
 
 # Automation Demo Video
 
-This 15-minute video demonstrates the MusicGate
-Playwright Automation project and its automated UI tests.
+This 15-minute video demonstrates the MusicGate Playwright Automation project and its automated UI tests.
 
 [▶ Watch the Full Automation Demo (15 Minutes)](https://www.youtube.com/watch?v=bD2FuiPhwwA)
-A total of 46 automated UI tests were created during the project.
+
 ---
 
 # Technologies Used
@@ -38,7 +40,32 @@ A total of 46 automated UI tests were created during the project.
 - Pytest
 - Allure Reports
 - Page Object Model (POM)
-- GitHub
+- GitHub Actions (CI)
+
+---
+
+# Project Structure
+
+```
+MusicGateAutomation/
+├── POM/                         # Page Objects
+│   ├── base_page.py             # BasePage - shared logic for every page
+│   ├── cart/
+│   ├── footer/
+│   ├── instruments/             # guitars, amplifiers, keyboards, percussion, wind
+│   ├── login/
+│   └── search/
+├── tests/
+│   ├── Cart/
+│   ├── Categories/
+│   ├── Footer/
+│   ├── Login/
+│   ├── Search/
+│   └── Smoke/
+├── conftest.py                  # global timeouts for a slow live site
+├── pytest.ini                   # test paths + "smoke" marker
+└── .github/workflows/           # GitHub Actions CI
+```
 
 ---
 
@@ -48,153 +75,79 @@ The project follows the Page Object Model (POM) design pattern in order to impro
 - Readability
 - Maintainability
 - Reusability
-- Scalability
 
-The framework structure includes:
-- Tests
-- Page Objects
-- Base Pages
-- Allure Reporting
+Every page class inherits from **BasePage**, which handles opening pages and the site's loading behavior in one place. Tests only call clear actions (for example `cart_page.add_to_cart(...)`) and contain no raw locators.
+
+Other techniques used:
+- `@pytest.mark.parametrize` - one test function covers several subcategories / search inputs
+- Pytest fixtures - shared setup (for example "cart with a product already added")
+- Playwright auto-waiting with `expect` - no hard-coded sleeps
+
+---
+
+# Continuous Integration
+
+A GitHub Actions workflow runs the **smoke tests** (`pytest -m smoke`) on every push.
+Smoke tests are a small set of critical checks: the homepage loads, the login page opens, search works, and a product can be added to the cart.
+
+Allure results from each CI run are saved as a downloadable artifact.
 
 ---
 
-# Challenges During Automation
+# Challenges and How They Were Solved
 
-This project was built on a real WooCommerce-based e-commerce website, which introduced several automation challenges during development and execution.
+This project was built on a real, live website. The goal was not only to validate functionality, but to understand **why** tests fail on a real site and fix the root cause.
 
-The purpose of these tests was not only to validate functionality, but also to understand how unstable UI behavior, timing issues, and dynamic rendering affect automation reliability in real-world environments.
+## The Loading Screen (WP Rocket)
 
-## Homepage Stability
+The site uses WP Rocket, which delays loading JavaScript until the user moves the mouse or scrolls. Until then, a loading overlay blocks every click.
 
-The homepage became one of the most important parts of the framework because many tests depended on it as the main entry point.
-
-Several failures were caused by:
-- Incomplete page loading
-- Dynamic content rendering
-- Navigation timing issues
-- Menus loading before the page fully stabilized
-
-To improve execution stability, additional synchronization and improved page loading strategies were introduced through the BasePage architecture.
-
----
+- **First attempt:** slowing the tests down with SlowMo (best result: 4000ms, 82.6% pass rate)
+- **Root cause fix:** BasePage simulates a mouse move and scroll after opening each page, then waits for the overlay to disappear
+- **Result:** all tests run at full speed without SlowMo
 
 ## Mega Menu and Categories
 
-The categories section was one of the most unstable areas of the website during automation.
+The category menu opens on hover and expects a second click to navigate.
+The page object hovers, waits for the menu to report it is open (`aria-expanded="true"`), and only then clicks.
 
-Challenges included:
-- Dynamic mega menus
-- Hover-sensitive navigation
-- Menus collapsing during execution
-- Click interception issues
-- Timeout failures on category navigation
+## Shopping Cart (AJAX)
 
-These behaviors became more noticeable during faster execution speeds.
+"Add to cart" sends the product to the server in the background, without reloading the page. Moving to the cart too early produced an empty cart - a **flaky test**.
+The fix waits for the server's response to the add-to-cart request before continuing.
 
----
+## A Live Site Changes
 
-## Search Functionality
+Some failures were not bugs in the tests or in the site, but changes to the site:
+- A product used in the tests was removed (page returns 404)
+- Another product went out of stock (no "add to cart" button)
+- A button label changed from "חיפוש" to "חפש"
+- Some URLs end with `/` and some do not
 
-The search system generally behaved well, but some issues appeared during repeated executions.
+Each failure was investigated in the browser (Inspect / Network) before deciding whether to fix the test or report a bug.
 
-Observed issues included:
-- Slow search result rendering
-- Delayed page updates
-- Dynamic sorting behavior
-- Timing inconsistencies after navigation
+## Out of Scope
 
-Different SlowMo values were tested in order to improve reliability and reduce flaky behavior.
+Checkout and registration were intentionally excluded: they involve multiple redirects, session state and highly dynamic WooCommerce behavior that need a more advanced setup (test accounts, data cleanup).
 
 ---
 
-## Shopping Cart Behavior
+# Bugs Found
 
-The shopping cart included several AJAX-based UI updates which introduced synchronization challenges.
+| Bug | Status in the framework |
+|---|---|
+| On the Hebrew site, the search results title is shown in English ("Search Results for ...") | Documented with `xfail` |
 
-Observed behaviors:
-- Delayed quantity updates
-- Dynamic cart refreshes
-- Temporary UI inconsistencies
-- Delayed cart counter rendering
-
-Although most cart tests became stable, the WooCommerce rendering behavior still caused occasional inconsistencies.
-
----
-
-## Checkout Flow
-
-The checkout flow was intentionally excluded from the final automation scope due to instability and excessive complexity for the current framework stage.
-
-Main challenges:
-- Multiple redirects
-- Returning to previous pages
-- Dynamic checkout rendering
-- Session-related inconsistencies
-- Unstable automation flow behavior
-- Highly dynamic WooCommerce updates
-
-The checkout flow required significantly more advanced synchronization and state handling than other tested areas.
-
----
-
-## Registration Flow
-
-The registration flow also introduced several automation difficulties.
-
-Observed issues:
-- Dynamic form behavior
-- Inconsistent page refreshes
-- Validation timing issues
-- Unexpected redirects
-- State instability between executions
-
-Because of this, registration automation was not fully included in the final stable framework scope.
-
----
-
-## Social Media Redirects
-
-Footer social media tests occasionally failed due to:
-- External redirects
-- Popup behavior
-- Browser security handling
-- Timing inconsistencies after redirection
-
-These failures were environmental and UI-related rather than framework-related.
-
----
-
-# Stability Benchmark Testing
-
-Several SlowMo configurations were tested in order to evaluate framework stability under different execution speeds.
-
-Tested values:
-- 1000ms
-- 2000ms
-- 3000ms
-- 4000ms
-- 5000ms
-
-Observed results:
-- Lower SlowMo values produced more failures
-- Faster execution exposed additional timing issues
-- 4000ms produced the most stable overall execution results
-
-Final benchmark result:
-- 46 automated tests
-- 82.6% pass rate
+Removed feature (not a bug): the Instagram link was removed from the footer because the account no longer exists - the test is marked `skip` with the reason.
 
 ---
 
 # Future Improvements
 
-Possible future improvements for the framework may include:
-- Better synchronization strategies
-- Improved locator stability
-- Retry mechanisms
-- Advanced waiting logic
-- More resilient navigation handling
-- Improved support for highly dynamic WooCommerce behavior
+- Login tests: verify the actual error message, not only that the form is still shown
+- Run tests in parallel to reduce execution time
+- Publish the Allure report to GitHub Pages
+- API tests
 
 ---
 
@@ -218,26 +171,16 @@ This project combined my interest in music with my passion for software QA and a
 
 ## Supported Platforms
 
-This framework supports:
 - Windows
 - macOS
-- Linux distributions (including Ubuntu)
-
----
+- Linux (including Ubuntu)
 
 ## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
-```
-
-Install Playwright browsers:
-
-```bash
 playwright install
 ```
-
----
 
 ## Run All Tests
 
@@ -245,26 +188,31 @@ playwright install
 pytest
 ```
 
----
-
-## Run Tests With SlowMo
+## Run Only Smoke Tests
 
 ```bash
-pytest --headed --slowmo 4000
+pytest -m smoke
+```
+
+## Watch The Browser
+
+```bash
+pytest --headed
+pytest --headed --slowmo 500   # slow down each action
 ```
 
 ---
 
 # Allure Reports
 
-Generate Allure report:
+Run tests and save results:
 
 ```bash
-allure generate allure-results -o allure-report --clean
+pytest --alluredir=allure-results --clean-alluredir
 ```
 
-Open Allure report:
+Open the report:
 
 ```bash
-allure open allure-report
+allure serve allure-results
 ```

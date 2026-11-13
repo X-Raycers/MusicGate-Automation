@@ -1,16 +1,5 @@
-from playwright.sync_api import Page
+from POM.base_page import BasePage
 
 
-class BasePage:
-
-    def __init__(self, page: Page):
-        self.page = page
-
-    def open_homepage(self):
-        self.page.goto(
-            "https://musicgate.co.il/"
-        )
-
-        self.page.wait_for_load_state(
-            "networkidle"
-        )
+class HomePage(BasePage):
+    """MusicGate homepage. Opening and the WP Rocket wake-up live in BasePage."""

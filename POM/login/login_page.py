@@ -1,37 +1,28 @@
-from pages.common.base_page import BasePage
+from POM.base_page import BasePage
+
+LOGIN_PATH = "/%d7%94%d7%a8%d7%a9%d7%9e%d7%aa%d7%9c%d7%a7%d7%95%d7%97"
 
 
 class LoginPage(BasePage):
+    """Customer login form."""
 
     def open_login_page(self):
-        self.page.goto(
-            "https://musicgate.co.il/%d7%94%d7%a8%d7%a9%d7%9e%d7%aa%d7%9c%d7%a7%d7%95%d7%97"
-        )
+        self.open(LOGIN_PATH)
 
     def click_login_button(self):
-        self.page.locator(
-            "#menu-extra-login"
-        ).click()
+        self.page.locator("#menu-extra-login").click()
 
-    def fill_email(self, email):
-        self.page.locator(
-            "#username"
-        ).fill(email)
+    def fill_email(self, email: str):
+        self.username_field().fill(email)
 
-    def fill_password(self, password):
-        self.page.locator(
-            "#password"
-        ).fill(password)
+    def fill_password(self, password: str):
+        self.password_field().fill(password)
 
     def submit_login(self):
-        self.page.locator(
-            'button[name="login"]'
-        ).click()
+        self.page.locator('button[name="login"]').click()
 
     def click_remember_me_checkbox(self):
-        self.page.locator(
-            "label.woocommerce-form-login__rememberme"
-        ).click()
+        self.page.locator("label.woocommerce-form-login__rememberme").click()
 
     def click_show_password_button(self):
         self.page.locator(
