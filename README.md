@@ -108,8 +108,7 @@ This project was built on a real, live website. The goal was not only to validat
 
 The site uses WP Rocket, which delays loading JavaScript until the user moves the mouse or scrolls. Until then, a loading overlay blocks every click.
 
-- **First attempt:** slowing the tests down with SlowMo (best result: 4000ms, 82.6% pass rate)
-- **Root cause fix:** BasePage simulates a mouse move and scroll after opening each page, then waits for the overlay to disappear
+- **Earlier version:** the tests were slowed down with SlowMo- **Root cause fix:** BasePage simulates a mouse move and scroll after opening each page, then waits for the overlay to disappear
 - **Result:** all tests run at full speed without SlowMo
 
 ## Mega Menu and Categories
