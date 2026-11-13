@@ -84,6 +84,11 @@ Other techniques used:
 - Playwright auto-waiting with `expect` - no hard-coded sleeps
 
 ---
+# Allure Report
+
+![Allure Report](docs/allure-report.png)
+
+--- 
 
 # Continuous Integration
 
